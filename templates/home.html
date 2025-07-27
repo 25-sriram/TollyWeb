@@ -191,27 +191,27 @@
 </head>
 <body>
     <div class="layout">
-        
+        <!-- Sidebar -->
         <div class="sidebar">
             <div style="font-size: 22px; font-weight: bold; color: red; margin-bottom: 30px;">TollyZilla</div>
             <a href="/home">Home</a>
             <a href="/account">Account</a>
         </div>
 
-        
+        <!-- Main Content -->
         <div class="main-content">
             <div class="navbar">TollyZilla</div>
 
-           
+            <!-- Featured Movie Section -->
             <div class="featured">
                 <div class="arrow left" onclick="prevSlide()">❮</div>
-                <img src="{{ url_for('static', filename='movies/fnew1.jpg') }}" class="active">
+                <img src="{{ url_for('static', filename='movies/movies(1).jpg') }}" class="active">
                 <img src="{{ url_for('static', filename='movies/fnew2.jpg') }}">
                 <img src="{{ url_for('static', filename='movies/fnew3.jpg') }}">
                 <div class="arrow right" onclick="nextSlide()">❯</div>
             </div>
 
-            
+            <!-- Trending Section -->
             <div class="section-title">Trending Now</div>
             <div class="movie-row">
                 {% if trending %}
@@ -227,7 +227,7 @@
                 {% endif %}
             </div>
 
-            
+            <!-- Recent Releases -->
             <div class="section-title">Recent Releases</div>
             <div class="movie-row">
                 {% if recent %}
@@ -243,7 +243,7 @@
                 {% endif %}
             </div>
 
-            
+            <!-- Upcoming Movies -->
             <div class="section-title">Upcoming Movies</div>
             <div class="movie-row">
                 {% if upcoming %}
