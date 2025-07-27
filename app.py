@@ -72,8 +72,13 @@ def logout():
 def account():
     if 'username' not in session:
         return redirect(url_for('login'))
-    return render_template('account.html', username=session['username'])
 
+    return render_template(
+        'account.html',
+        username=session.get('username'),
+        name=session.get('name'),
+        email=session.get('email'),
+        mobile=session.get('mobile'))
 
 def fetch_movies(url, params=None):
     try:
