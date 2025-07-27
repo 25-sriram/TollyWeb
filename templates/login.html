@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login</title>
+    <style>
+        body {
+            background: url("/static/bg.jpg") no-repeat center center fixed;
+            background-size: cover;
+            margin: 0;
+            font-family: Lucida Handwriting, cursive;
+            display: flex;
+            height: 100vh;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .quote {
+            color: rgba(239, 228, 228, 0.947);
+            width: 50%;
+            padding-left: 50px;
+            font-size: 24px;
+            text-shadow: 2px 2px 4px #e8e5e5;
+        }
+        .box {
+            background: rgba(0, 0, 0, 0.161);
+            padding: 35px;
+            width: 350px;
+            margin-right: 150px;
+            text-align: center;
+            border-radius: 20px;
+        }
+        input {
+            margin: 10px 0;
+            width: 90%;
+            padding: 10px;
+        }
+        button {
+            padding: 10px;
+            width: 95%;
+            background: #e1106ee7;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+        .google-btn {
+            background: white;
+            color: #efdadad4;
+            border: 1px solid #ccc;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+        .google-btn img {
+            width: 20px;
+            vertical-align: middle;
+            margin-right: 10px;
+        }
+        a {
+            display: block;
+            margin-top: 10px;
+            color: white;
+        }
+        .flash-message {
+            color: white;
+            font-size: 16px;
+            font-family: Lucida Handwriting, cursive;
+            margin-bottom: 20px;
+        }
+        @media (max-width: 768px) {
+            body {
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+            }
+            .quote {
+                width: 100%;
+                padding: 50px;
+                text-align: center;
+                font-size: 20px;
+            }
+            .box {
+                margin: 20px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="quote">
+         "Cinema is a mirror by which we often see ourselves."
+    </div>
+
+    <div class="box">
+        <h2>Login</h2>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash-message">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <form action="/login" method="post">
+            <input type="text" name="username" placeholder="Username" required><br>
+            <input type="password" name="password" placeholder="Password" required><br>
+            <button type="submit">Sign In</button>
+        </form>
+
+        <p style="color: white;">or</p>
+
+        <a href="/login/google">
+            <button class="google-btn">
+                <img src="https://developers.google.com/identity/images/g-logo.png" />
+                Sign in with Google
+            </button>
+        </a>
+
+        <a href="/signup">Don't have an account? Sign Up</a>
+    </div>
+</body>
+</html>

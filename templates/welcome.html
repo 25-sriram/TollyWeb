@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Welcome</title>
+    <style>
+        body {
+            background-image: url("/static/bg2.jpg");
+            background-size: cover;
+            background-position: center;
+            height: 100vh;
+            margin: 0;
+            font-family: "Lucida Console", "Courier New", monospace;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 48px;
+            margin-bottom: 40px;
+            text-shadow: 2px 2px 4px rgb(242, 228, 228);
+        }
+
+        .button {
+            background-color: #b10b53;
+            border: none;
+            color: white;
+            padding: 15px 30px;
+            font-size: 18px;
+            margin: 10px;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+
+        .help-box {
+            margin-top: 20px;
+            background-color: rgba(17, 16, 16, 0.313);
+            color: rgb(233, 228, 228);
+            padding: 20px;
+            border-radius: 10px;
+            width: 60%;
+            display: none;
+        }
+    </style>
+    <script>
+        function toggleHelp() {
+            const helpBox = document.getElementById("helpBox");
+            helpBox.style.display = helpBox.style.display === "none" ? "block" : "none";
+        }
+    </script>
+</head>
+<body>
+    <h1>Welcome to Movies Hub</h1>
+
+    <a href="/login">
+    <button class="button">Login</button>
+</a>
+
+    <button class="button" onclick="toggleHelp()">Help</button>
+
+    <div id="helpBox" class="help-box">
+        <h3>How to Login and Register</h3>
+        <p><strong>To Login:</strong><br>Click on the "Login" button and enter your username and password.</p>
+        <p><strong>To Register:</strong><br>Visit the <a href="/signup">Sign Up</a> page, fill in your details, and submit the form.</p>
+    </div>
+</body>
+</html>

@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Movie Home</title>
+    <style>
+        body {
+            margin: 0;
+            background-color: #141414;
+            font-family: Arial, sans-serif;
+            color: white;
+            overflow-x: hidden;
+        }
+
+        .layout {
+            display: flex;
+        }
+
+        .sidebar {
+            width: 160px;
+            background-color: #000;
+            padding: 20px;
+            height: 100vh;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.5);
+            position: fixed;
+            top: 0;
+            left: 0;
+        }
+
+        .sidebar a {
+            display: block;
+            margin: 20px 0;
+            color: white;
+            text-decoration: none;
+            font-size: 18px;
+        }
+
+        .sidebar a:hover {
+            color: red;
+        }
+
+        .navbar {
+            background-color: #000;
+            padding: 20px;
+            font-size: 22px;
+            font-weight: bold;
+            color: red;
+        }
+
+        .featured {
+            position: relative;
+            width: 100%;
+            height: 600px;
+            overflow: hidden;
+            margin-bottom: 40px;
+            z-index: 0;
+        }
+
+        .main-content {
+            margin-left: 200px;
+            width: calc(100% - 200px);
+        }
+
+        .featured img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: none;
+        }
+
+        .main-content {
+            clear: both;
+            padding-top: 20px;
+        }
+
+        .featured img.active {
+            display: block;
+        }
+
+        .arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 48px;
+            background: rgba(0,0,0,0.4);
+            padding: 10px;
+            cursor: pointer;
+            z-index: 1;
+            user-select: none;
+        }
+
+        .arrow.left {
+            left: 10px;
+        }
+
+        .arrow.right {
+            right: 10px;
+        }
+
+        .section-title {
+            margin: 20px;
+            font-size: 24px;
+        }
+
+        .movie-row {
+            display: flex;
+            overflow-x: auto;
+            scroll-behavior: smooth;
+            padding: 0 20px 30px 20px;
+            gap: 16px;
+        }
+
+        .movie-row::-webkit-scrollbar {
+            display: none;
+        }
+
+        .movie {
+            flex: 0 0 auto;
+            width: 200px;
+            height: auto;
+            border-radius: 8px;
+            position: relative;
+        }
+
+        .movie img {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        .movie .title {
+            text-align: center;
+            margin-top: 8px;
+            font-size: 14px;
+            color: #fff;
+        }
+
+        .rating {
+            position: absolute;
+            bottom: 40px;
+            right: 10px;
+            background-color: rgba(0,0,0,0.7);
+            padding: 4px 8px;
+            border-radius: 5px;
+            font-size: 14px;
+            color: gold;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        @media (max-width: 768px) {
+            .movie {
+                width: 160px;
+            }
+
+            .movie img {
+                height: 240px;
+            }
+
+            .sidebar {
+                width: 160px;
+            }
+
+            .main-content {
+                margin-left: 160px;
+                width: calc(100% - 160px);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .movie {
+                width: 100%;
+            }
+
+            .movie img {
+                height: auto;
+            }
+
+            .sidebar {
+                display: none;
+            }
+
+            .main-content {
+                margin-left: 0;
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="layout">
+        
+        <div class="sidebar">
+            <div style="font-size: 22px; font-weight: bold; color: red; margin-bottom: 30px;">TollyZilla</div>
+            <a href="/home">Home</a>
+            <a href="/account">Account</a>
+        </div>
+
+        
+        <div class="main-content">
+            <div class="navbar">TollyZilla</div>
+
+           
+            <div class="featured">
+                <div class="arrow left" onclick="prevSlide()">❮</div>
+                <img src="{{ url_for('static', filename='movies/fnew1.jpg') }}" class="active">
+                <img src="{{ url_for('static', filename='movies/fnew2.jpg') }}">
+                <img src="{{ url_for('static', filename='movies/fnew3.jpg') }}">
+                <div class="arrow right" onclick="nextSlide()">❯</div>
+            </div>
+
+            
+            <div class="section-title">Trending Now</div>
+            <div class="movie-row">
+                {% if trending %}
+                    {% for movie in trending %}
+                    <div class="movie">
+                        <img src="https://image.tmdb.org/t/p/w500{{ movie.poster_path }}" alt="{{ movie.title }}">
+                        <div class="rating">⭐ {{ movie.vote_average }}</div>
+                        <div class="title">{{ movie.title }}</div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <p style="margin-left: 20px;">No trending movies available. Check API or connection.</p>
+                {% endif %}
+            </div>
+
+            
+            <div class="section-title">Recent Releases</div>
+            <div class="movie-row">
+                {% if recent %}
+                    {% for movie in recent %}
+                    <div class="movie">
+                        <img src="https://image.tmdb.org/t/p/w500{{ movie.poster_path }}" alt="{{ movie.title }}">
+                        <div class="rating">⭐ {{ movie.vote_average }}</div>
+                        <div class="title">{{ movie.title }}</div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <p style="margin-left: 20px;">No recent releases found.</p>
+                {% endif %}
+            </div>
+
+            
+            <div class="section-title">Upcoming Movies</div>
+            <div class="movie-row">
+                {% if upcoming %}
+                    {% for movie in upcoming %}
+                    <div class="movie">
+                        <img src="https://image.tmdb.org/t/p/w500{{ movie.poster_path }}" alt="{{ movie.title }}">
+                        <div class="rating">⭐ {{ movie.vote_average }}</div>
+                        <div class="title">{{ movie.title }}</div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <p style="margin-left: 20px;">No upcoming movies found.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let current = 0;
+        const slides = document.querySelectorAll('.featured img');
+
+        function showSlide(index) {
+            slides.forEach((img, i) => {
+                img.classList.toggle('active', i === index);
+            });
+        }
+
+        function prevSlide() {
+            current = (current - 1 + slides.length) % slides.length;
+            showSlide(current);
+        }
+
+        function nextSlide() {
+            current = (current + 1) % slides.length;
+            showSlide(current);
+        }
+    </script>
+</body>
+</html>

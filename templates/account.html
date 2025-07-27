@@ -1,0 +1,148 @@
+account.html
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Account Page</title>
+    <style>
+        @font-face {
+            font-family: 'Avengers';
+            src: url("{{ url_for('static', filename='Avengers.ttf') }}") format('truetype');
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            color: white;
+            background-image: url("{{ url_for('static', filename='bg3.jpg') }}");
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        .layout {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .sidebar {
+            width: 200px;
+            background-color: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+        }
+
+        .sidebar a {
+            display: block;
+            margin: 20px 0;
+            color: white;
+            text-decoration: none;
+        }
+
+        .main-content {
+            flex: 1;
+            margin-left: 220px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .content {
+            background-color: rgba(0, 0, 0, 0.6);
+            padding: 30px 50px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        h1 {
+            font-family: 'Avengers', cursive; /* or your chosen font */
+            font-size: 48px;
+            text-align: center;
+            letter-spacing: 3px;  /* Adjust the value for more or less spacing */
+        }
+
+        .content p {
+            font-size: 20px;
+            margin: 15px 0;
+        }
+
+        input[type="text"], input[type="email"] {
+            width: 70%;
+            padding: 8px;
+            margin: 8px 0;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+
+        button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: red;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background-color: darkred;
+        }
+
+        #editForm {
+            margin-top: 25px; /* More gap between Edit button and form */
+        }
+    </style>
+    <script>
+        function toggleEditForm() {
+            const form = document.getElementById('editForm');
+            form.style.display = form.style.display === 'none' ? 'block' : 'none';
+        }
+    </script>
+</head>
+<body>
+    <div class="layout">
+        <div class="sidebar">
+            <h2>TollyZilla</h2>
+            <a href="/home">Home</a>
+            <a href="/account">Account</a>
+        </div>
+
+        <div class="main-content">
+            <div class="content">
+                <h1>Account Details</h1>
+                <p><strong>Name:</strong> {{ name }}</p>
+                <p><strong>Username:</strong> {{ username }}</p>
+                <p><strong>Email:</strong> {{ email }}</p>
+                <p><strong>Mobile:</strong> {{ mobile }}</p>
+
+                <button onclick="toggleEditForm()">Edit</button>
+
+                <form id="editForm" method="POST" action="/update_account" style="display:none;">
+                    <label>Name:</label><br>
+                    <input type="text" name="name" value="{{ name }}" required><br>
+
+                    <label>Username:</label><br>
+                    <input type="text" name="username" value="{{ username }}" required><br>
+
+                    <label>Email:</label><br>
+                    <input type="email" name="email" value="{{ email }}" required><br>
+
+                    <label>Mobile:</label><br>
+                    <input type="text" name="mobile" value="{{ mobile }}" required><br>
+
+                    <button type="submit">Update</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+
+
