@@ -6,6 +6,7 @@ import os
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'
+app.permanent_session_lifetime = timedelta(days=7)
 DATABASE = 'users.db'
 
 TMDB_API_KEY = '639e38c46d00490d497c4e098bbf21d2'
@@ -60,6 +61,7 @@ def login():
         conn.close()
 
         if user:
+            session.permanent = True
             session['username'] = username
             flash("Login Successful!", "info")
             return redirect(url_for('home'))
@@ -239,6 +241,6 @@ def home():
         upcoming=upcoming_movies
     )
 
+# ---------------- Run ----------------
 if __name__ == '__main__':
     app.run(debug=True)
-
