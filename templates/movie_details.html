@@ -1,0 +1,94 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ movie.title }}</title>
+    <style>
+        body { background-color: black; color: white; font-family: Arial; margin: 0; padding: 20px; }
+        .container { display: flex; gap: 30px; margin-left: 200px; }
+        img { border-radius: 10px; }
+        .details { max-width: 600px; }
+        h1 { margin-top: 0; }
+        .cast { margin-top: 20px; }
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url("https://image.tmdb.org/t/p/w500{{ movie.poster_path }}");
+            background-size: cover;
+            background-position: center;
+            opacity: 0.15; 
+            z-index: -1; 
+        }
+
+        .sidebar {
+            width: 160px;
+            background-color: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            height: 100vh;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.5);
+            position: fixed;
+            top: 0;
+            left: 0;
+        }
+
+        .sidebar a {
+            display: block;
+            margin: 20px 0;
+            color: white;
+            text-decoration: none;
+            font-size: 18px;
+        }
+
+        .sidebar a:hover {
+            color: red;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <img src="https://image.tmdb.org/t/p/w500{{ movie.poster_path }}" alt="{{ movie.title }}">
+        <div class="details">
+            <h1>{{ movie.title }}</h1>
+            <p><strong>Release Date:</strong> {{ movie.release_date }}</p>
+            <p><strong>Rating:</strong> ⭐ {{ movie.vote_average }}</p>
+            <p>{{ movie.overview }}</p>
+            <div class="cast">
+    <h3>Cast:</h3>
+    <div style="display: flex; flex-wrap: wrap; gap: 15px;">
+        {% for cast in cast_data %}
+            <div style="text-align: center; width: 100px;">
+                {% if cast.profile_path %}
+                    <img src="https://image.tmdb.org/t/p/w185{{ cast.profile_path }}" 
+                         alt="{{ cast.name }}" 
+                         style="width:100px; height:150px; object-fit:cover; border-radius:8px;">
+                {% else %}
+                    <div style="width:100px; height:150px; background:#333; 
+                                border-radius:8px; display:flex; align-items:center; 
+                                justify-content:center; font-size:12px; color:#aaa;">
+                        No Image
+                    </div>
+                {% endif %}
+                <p style="margin:5px 0 0; font-size:14px;">{{ cast.name }}</p>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+
+        </div>
+    </div>
+
+    <div class="sidebar">
+        <div style="font-size: 22px; font-weight: bold; color: red; margin-bottom: 30px;">TollyZilla</div>
+        <a href="{{ url_for('search_page') }}">Search</a>
+        <a href="/home">Home</a>
+        <a href="/account">Account</a>
+    </div>
+</body>
+</html>
+
+
