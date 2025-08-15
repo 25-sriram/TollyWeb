@@ -3,6 +3,7 @@ import sqlite3
 import requests
 from datetime import datetime, timedelta
 import os
+import random
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'
@@ -11,6 +12,27 @@ DATABASE = 'users.db'
 
 TMDB_API_KEY = '639e38c46d00490d497c4e098bbf21d2'
 TMDB_BASE_URL = 'https://api.themoviedb.org/3'
+GENRE_MAP = {
+    "action": 28,
+    "adventure": 12,
+    "animation": 16,
+    "comedy": 35,
+    "crime": 80,
+    "documentary": 99,
+    "drama": 18,
+    "family": 10751,
+    "fantasy": 14,
+    "history": 36,
+    "horror": 27,
+    "music": 10402,
+    "mystery": 9648,
+    "romance": 10749,
+    "science fiction": 878,
+    "tv movie": 10770,
+    "thriller": 53,
+    "war": 10752,
+    "western": 37
+}
 
 # Create database if not exists
 def init_db():
@@ -32,7 +54,6 @@ def init_db():
 
 init_db()
 
-# ---------------- DB Helper ----------------
 def get_db():
     if 'db' not in g:
         g.db = sqlite3.connect(DATABASE)
@@ -44,9 +65,15 @@ def close_db(error):
     if db:
         db.close()
 
+
 @app.route('/')
 def welcome():
     return render_template('welcome.html')
+
+
+@app.route('/')
+def index():
+    return redirect(url_for('login'))
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -155,7 +182,7 @@ def update_account():
     session['username'] = new_username  
     return redirect('/account')
 
-# ---------------- TMDB Data Fetch ----------------
+
 def fetch_movies(url, params=None):
     try:
         response = requests.get(url, params=params, timeout=5)
@@ -164,6 +191,97 @@ def fetch_movies(url, params=None):
     except requests.RequestException as e:
         print(f"TMDB API Request Failed: {e}")
         return []
+
+def fetch_movie_details(movie_id):
+    """Fetch detailed movie info including runtime."""
+    try:
+        response = requests.get(
+            f"{TMDB_BASE_URL}/movie/{movie_id}",
+            params={'api_key': TMDB_API_KEY, 'language': 'en-US'},
+            timeout=5
+        )
+        response.raise_for_status()
+        return response.json()
+    except requests.RequestException as e:
+        print(f"TMDB Details API Failed: {e}")
+        return {}
+
+@app.route('/movie/<int:movie_id>')
+def movie_details(movie_id):
+    movie = {}
+    cast_list = []
+    cast_data_full = []  # <-- NEW: full cast info with profile_path
+
+    try:
+        # Movie details
+        details_url = f"{TMDB_BASE_URL}/movie/{movie_id}"
+        details_params = {'api_key': TMDB_API_KEY}
+        movie = requests.get(details_url, params=details_params).json()
+
+        # Cast details
+        cast_url = f"{TMDB_BASE_URL}/movie/{movie_id}/credits"
+        cast_params = {'api_key': TMDB_API_KEY}
+        credits_response = requests.get(cast_url, params=cast_params).json()
+        cast = credits_response.get('cast', [])[:10]  # top 10 only
+
+        # Keep your original list of names
+        cast_list = [c['name'] for c in cast]
+        # Add full cast info for images
+        cast_data_full = cast  
+
+    except requests.RequestException as e:
+        print(f"Error fetching movie details: {e}")
+
+    return render_template(
+        'movie_details.html',
+        movie=movie,
+        cast_list=cast_list,        # unchanged (name list)
+        cast_data=cast_data_full    # new variable for images
+    )
+
+
+@app.route('/search', methods=['GET'])
+def search_page():
+    query = request.args.get("q", "").lower().strip()
+    movies = []
+
+    if query:
+        # --- Detect genre ---
+        genre_id = None
+        for name, gid in GENRE_MAP.items():
+            if name in query:
+                genre_id = gid
+                break
+
+        # --- Detect language ---
+        lang = None
+        if "tamil" in query:
+            lang = "ta"
+        elif "english" in query:
+            lang = "en"
+        elif "hindi" in query:
+            lang = "hi"
+
+        if genre_id or lang:
+            # Use Discover API for genre/language searches
+            discover_url = f"{TMDB_BASE_URL}/discover/movie"
+            params = {
+                "api_key": TMDB_API_KEY,
+                "with_genres": genre_id if genre_id else "",
+                "with_original_language": lang if lang else "",
+                "sort_by": "popularity.desc"
+            }
+            response = requests.get(discover_url, params=params).json()
+            movies = response.get("results", [])
+        else:
+            # Default search by keyword/title/actor
+            search_url = f"{TMDB_BASE_URL}/search/movie"
+            params = {"api_key": TMDB_API_KEY, "query": query}
+            response = requests.get(search_url, params=params).json()
+            movies = response.get("results", [])
+
+    return render_template("search.html", query=query, movies=movies)
+
 
 @app.route('/home')
 def home():
@@ -229,7 +347,42 @@ def home():
         }
     )
 
-    # Merge English + Tamil movies
+    top_rated_hindi = fetch_movies(
+        f"{TMDB_BASE_URL}/discover/movie",
+        params={
+            'api_key': TMDB_API_KEY,
+            'with_original_language': 'hi',
+            'sort_by': 'vote_average.desc',
+            'vote_count.gte': 100
+        }
+    )
+
+    top_rated_tamil = fetch_movies(
+        f"{TMDB_BASE_URL}/discover/movie",
+        params={
+            'api_key': TMDB_API_KEY,
+            'with_original_language': 'ta',
+            'sort_by': 'vote_average.desc',
+            'vote_count.gte': 100
+        }
+    )
+
+    # Merge Hindi + Tamil
+    top_rated_movies = top_rated_hindi[:5] + top_rated_tamil[:5]
+
+    # Add runtime + overview
+    enriched_top_rated = []
+    for movie in top_rated_movies:
+        details = fetch_movie_details(movie['id'])
+        enriched_top_rated.append({
+            'title': movie.get('title'),
+            'backdrop_path': movie.get('backdrop_path'),
+            'vote_average': movie.get('vote_average'),
+            'overview': movie.get('overview'),
+            'runtime': details.get('runtime', None),
+            'release_date': movie.get('release_date')
+        })
+
     recent_releases = recent_english + recent_tamil
     upcoming_movies = upcoming_english + upcoming_tamil
 
@@ -238,9 +391,11 @@ def home():
         username=session['username'],
         trending=trending_movies,
         recent=recent_releases,
-        upcoming=upcoming_movies
+        upcoming=upcoming_movies,
+        top_rated=enriched_top_rated
     )
 
-# ---------------- Run ----------------
 if __name__ == '__main__':
     app.run(debug=True)
+
+
