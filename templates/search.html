@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Search Movies</title>
+    <style>
+        body {  
+            color: white; 
+            font-family: Arial, sans-serif; 
+            margin: 0;
+            display: flex;
+            background-image: url("{{ url_for('static', filename='bg4.jpg') }}");
+            background-size: cover;
+            background-position: center center;
+            background-repeat: no-repeat;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 160px;
+            background-color: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            height: 100vh;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.5);
+            position: fixed;
+            top: 0;
+            left: 0;
+        }
+
+        .sidebar a {
+            display: block;
+            margin: 20px 0;
+            color: white;
+            text-decoration: none;
+            font-size: 18px;
+        }
+
+        .sidebar a:hover {
+            color: red;
+        }
+
+        /* Main content area */
+        .main-content {
+            margin-left: 200px; 
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .search-box { margin-top: 100px; }
+        input[type="text"] {
+            padding: 10px;
+            width: 400px;
+            border-radius: 25px;
+            border: none;
+            font-size: 16px;
+        }
+        button {
+            padding: 10px 20px;
+            border-radius: 25px;
+            border: none;
+            font-size: 16px;
+            background-color: red;
+            color: white;
+            cursor: pointer;
+        }
+        .results { display: flex; flex-wrap: wrap; justify-content: center; margin-top: 30px; }
+        .movie { margin: 10px; text-align: center; width: 150px; }
+        .movie img { width: 100%; border-radius: 10px; }
+        .movie h3 { font-size: 14px; margin-top: 5px; }
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div style="font-size: 22px; font-weight: bold; color: red; margin-bottom: 30px;">TollyZilla</div>
+        <a href="{{ url_for('search_page') }}">Search</a>
+        <a href="/home">Home</a>
+        <a href="/account">Account</a>
+    </div>
+
+    <!-- Main content -->
+    <div class="main-content">
+        <div class="search-box">
+            <form action="{{ url_for('search_page') }}" method="get">
+                <input type="text" name="q" placeholder="Search for a movie..." value="{{ query }}">
+                <button type="submit">Search</button>
+            </form>
+        </div>
+
+        {% if movies %}
+        <div class="results">
+            {% for movie in movies %}
+            <div class="movie">
+                <a href="{{ url_for('movie_details', movie_id=movie.id) }}">
+                    <img src="https://image.tmdb.org/t/p/w500{{ movie.poster_path }}" alt="{{ movie.title }}">
+                    <h3>{{ movie.title }}</h3>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+
+</body>
+</html>
